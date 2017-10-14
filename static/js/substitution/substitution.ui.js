@@ -243,17 +243,17 @@
         setFrequencyLettersDisplayValue: function(el, value, addClass, removeClass) {
 
             var element = $(el);
-            console.log(el);
-            console.log(element);
 
             if ((addClass && removeClass)) {
                 element.addClass(addClass);
                 element.removeClass(removeClass);
             }
              if (value) {
+                 element.attr('value', value);
                  element.html(value + ' =' + element.html().split(' =')[1]);
              }
              else {
+                 element.attr('value', "");
                  element.html(element.attr('original') + ' =' + element.html().split(' =')[1]);
              }
         },
@@ -268,22 +268,14 @@
             freeLetterContainer.append(freeLetter);
             freeLetterDict[value][1] = false;
             sortDivs(freeLetterContainer);
-        },
+        }
     }
 
 }(substitution || {}));
 
 
 /* Global variables to be used by all components */
-var dictionary = null; // maps each letter to its substitution
-var frequencyTable = null; // table of letter frequencies in the original message
-var frequencyDictionary = null;
-var ALPHABET = null; // array containing the 25 letters in the english alphabet for resetting
-var textDictionary = null;
-var freeLetterDictionary = null;
 var chartData = null;
-var eventLetter = null;
-var ind = null;
 
 /**
  * Sort element children doms by value attribute

@@ -62,8 +62,6 @@
                     'freeLetterDisplay', 'letterInputDisplay');
                 substitution.ui.removeFreeLetter(fromValue);
                 substitution.util.setSubstitution(toOriginal, fromValue);
-                console.log(toOriginal);
-                console.log(substitution.ui.getFrequencyLetters()[toOriginal]);
                 substitution.ui.setFrequencyLettersDisplayValue(substitution.ui.getFrequencyLetters()[toOriginal], fromValue,
                     'letterFrequencyDisplaySolved', 'letterFrequencyDisplay');
             }
@@ -95,6 +93,7 @@
         },
         wordLetterDroppedOutside = function (from) {
             var fromValue = from.attr('value');
+            if (!fromValue) return;
             var fromOriginal = from.attr('original');
             removeWordLetter(fromValue, fromOriginal);
             substitution.ui.setFrequencyLettersDisplayValue(substitution.ui.getFrequencyLetters()[fromOriginal], "",
@@ -109,12 +108,23 @@
             substitution.ui.addFreeLetter(fromValue);
             unregisterEncryptedLetterDraggableEvent(lettersFrom);
         },
-        inputLetterChangeEvent = function(event) {
+        inputLetterChangeEvent = function(event, key_code) {
             var input = $(event.originalEvent.target);
             var inputValue = input.val().toUpperCase();
             var toOriginal = input.attr('original');
-            var fromValue = input.attr('value');
-            var invalid = false;
+
+            var fromValue;
+            if (key_code) {
+                fromValue = $(substitution.ui.getEncryptedLetters()[toOriginal][0]).attr('value')
+                if (![8, 27, 46].includes(key_code)) {
+                    inputValue = String.fromCharCode(key_code);
+                }
+            }
+            else {
+                inputValue = input.val().toUpperCase();
+                fromValue = input.attr('value');
+            }
+
             if (inputValue) {
                 if (inputValue in substitution.ui.getFreeLetters() &&
                     !substitution.ui.getFreeLetters()[inputValue][1]) {
@@ -229,12 +239,17 @@
         },
         registerFrequencyHoverEvent: function () {
             $('.letterFrequency').hover(
-                function () {
+                function (event) {
                     wordLetterHoverOnEvent($(this).attr('original'), $(this).attr('class').split(/\s+/),
-                        'letterInputDisplay');
-                }, function () {
-                    wordLetterHoverOffEvent($(this).attr('original'));
-            });
+                        'letterFrequencyDisplay');
+                     $(document).bind("keydown", function(e) {
+                         inputLetterChangeEvent(event, e.keyCode);
+                     });
+
+                 }, function () {
+                     wordLetterHoverOffEvent($(this).attr('original'));
+                     $(document).unbind("keydown");
+             });
         }
 
     }
