@@ -10,37 +10,40 @@ $(document).ready(function () {
         $("#myModal").css("display", "none");
     })
 
-    // animacija (2. upload)
-
-    $("#animation-btn-2").click(function () {
-        $("#dropbox-1").animate({marginLeft: "210px"}, 2000, "linear");
-        $("#dropbox-2").animate({marginLeft: "-430px"}, 2000, "linear");
-    });
-
-
     // upload gumb disabled dokler slika ni izbrana
     $('input[type=file][name="file"]').change(function () {
         var hasNoFiles = this.files.length == 0;
         $(this).closest('form').find('input[type=submit]').prop('disabled', hasNoFiles);
     });
 
+    var animation = false;
 
     // animacija slik (1. upload)
-
-    $('#noise-btn').click(function () {
-        $("#img-right").css("display", "inline-block");
+    function showNoise() {
+        if (animation) return;
+        $('#img-container').css("height", "0px");
+        $('#img-result').css("display", "none");
+        $("#img-left").css("margin", "auto");
+        $("#img-right").css("marginLeft", "20px");
         $("#img-left").css("display", "inline-block");
-    });
+        $("#img-right").css("display", "inline-block");
+    }
+
+    function revealMerged() {
+        $('#img-container').animate({"height": $("#img-result").height()}, 2000, "linear");
+        $('#img-result').css("display", "block");
+    }
+
+    $('#noise-btn').click(showNoise);
 
     $('#animation-btn').click(function () {
+        if (animation) return;
+        showNoise()
+        animation = true;
+        setTimeout(function() { animation = false; }, 4500);
         $("#img-left").animate({marginLeft: "210px"}, 2000, "linear");
         $("#img-right").animate({marginLeft: "-400px"}, 2000, "linear");
-        $("#img-container").delay(2600).show(0);
-        $('#img-container').animate({"height": "100%"}, 9000, "linear");
-        $('#img-result').css("display", "block");
-        $('#img-container').css("position", "absolute");
-        $('#img-container').css("margin-left", "210px");
-
+        setTimeout(revealMerged, 2500);
     });
 
 
@@ -59,9 +62,9 @@ $(document).ready(function () {
                     $wrap = $('<div class="file-upload-wrapper">'),
                     $input = $('<input type="text" class="file-upload-input" />'),
                     // Button that will be used in non-IE browsers
-                    $button = $('<button type="button" class="file-upload-button">Izberi</button>'),
+                    $button = $('<button type="button" class="file-upload-button">Izberi sliko</button>'),
                     // Hack for IE
-                    $label = $('<label class="file-upload-button" for="' + $file[0].id + '">Izberi</label>');
+                    $label = $('<label class="file-upload-button" for="' + $file[0].id + '">Izberi sliko</label>');
 
                 // Hide by shifting to the left so we
                 // can still trigger events
@@ -209,7 +212,7 @@ $(document).ready(function () {
             }, false);
             modal3.style.display = "block";
         }
-        console.log(picture.src);
+        //console.log(picture.src);
 
         close1.onclick = function () {
             modal1.style.display = "none";
@@ -229,14 +232,19 @@ $(document).ready(function () {
         };
 
         var fileInput = picture.src;
-        console.log(fileInput);
-
+        //console.log(fileInput);
+        $('#buttons').css("visibility", "visible");
+        $('#img-container').css("height", "0%");
+        $('#img-container').css("height", "0px");
+        $('#img-result').css("display", "none");
+        $("#img-left").css("display", "none");
+        $("#img-right").css("display", "none");
     });
 
     function uploadImage(fileInput) {
         $(function() {
             $.ajax({
-                url: '/steganography/visual',
+                url: imageURL,
                 data: {
                     'file': fileInput
                     },
@@ -253,6 +261,4 @@ $(document).ready(function () {
             });
         });
     }
-
 });
-        
